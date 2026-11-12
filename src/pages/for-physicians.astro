@@ -1,0 +1,63 @@
+---
+import LocationsSection from '../components/astro/LocationsSection.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/astro/PageHero.astro';
+import PageCta from '../components/astro/PageCta.astro';
+import Embed from '../components/astro/Embed.astro';
+import { site } from '../data/content';
+import { conditions } from '../data/conditions';
+import { embeds } from '../data/thirdparty';
+import { gaeSectionImage } from '../data/images';
+const ways = [
+  { t: 'Send the patient with records', d: 'Give the patient their medical information to bring to the visit.' },
+  { t: 'Call our office', d: `Call ${site.phone} and our team will take the details.` },
+  { t: 'Use the online form', d: 'Submit the referral form. We contact both you and your patient.' },
+];
+---
+<BaseLayout overlay title="For Physicians | Choice Pain & Rehabilitation Center" description="Refer a patient to CHOICE Pain & Rehabilitation Center for interventional pain management and rehabilitation across Maryland and Delaware.">
+  <PageHero eyebrow="For Physicians" title="Refer your patient with confidence" lede="We welcome referrals for orthopedic, sports medicine and other pain-related conditions from physicians and specialists in Maryland and the D.C. area." image={gaeSectionImage} />
+  <section class="section-pad bg-ivory">
+    <div class="container-x">
+      <div class="mx-auto max-w-3xl text-center"><p class="eyebrow">How to Refer</p><h2 class="section-title">Three easy ways to refer</h2><div class="accent-rule mx-auto mt-6"></div></div>
+      <ol class="mt-14 grid gap-6 md:grid-cols-3">
+        {ways.map((w, i) => (
+          <li class="group relative rounded-md border border-accent/25 bg-white p-8 transition duration-500 hover:-translate-y-2 hover:shadow-xl hover:shadow-navy/10">
+            <span class="flex h-14 w-14 items-center justify-center rounded-full bg-navy font-display text-2xl text-accent-light transition group-hover:bg-accent group-hover:text-white">{i + 1}</span>
+            <h3 class="mt-5 text-3xl text-navy">{w.t}</h3>
+            <p class="mt-2 text-muted">{w.d}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+  <section class="section-pad relative overflow-hidden bg-navy text-white" aria-labelledby="loop-title">
+    <div class="pointer-events-none absolute -right-20 top-0 h-80 w-80 rounded-full bg-accent/25 blur-3xl"></div>
+    <div class="container-x relative grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
+      <div>
+        <p class="eyebrow !text-accent-light">Keeping You in the Loop</p>
+        <h2 id="loop-title" class="mt-4 font-display text-4xl font-light md:text-6xl">Updates on <span class="hero-word">your patient</span></h2>
+        <p class="mt-6 text-lg leading-relaxed text-white/80">We send feedback and progress reports to the referring physician during and after treatment, so you always know how your patient is doing.</p>
+        <div class="mt-8 flex flex-wrap gap-4"><a href={site.phoneHref} class="btn btn-appointment">Call {site.phone}</a><a href="/genicular-artery-embolization" class="btn btn-light">Learn about GAE</a></div>
+      </div>
+      <div>
+        <p class="text-sm font-medium uppercase tracking-[0.2em] text-accent-light">Conditions we see</p>
+        <ul class="mt-5 flex flex-wrap gap-2">{conditions.slice(0, 14).map((c) => (<li class="rounded-full border border-white/20 bg-white/5 px-4 py-2 text-sm">{c.title}</li>))}</ul>
+      </div>
+    </div>
+  </section>
+  <section class="section-pad bg-cream" aria-labelledby="form-title">
+    <div class="container-x mx-auto max-w-4xl">
+      <div class="text-center"><p class="eyebrow">Referral Form</p><h2 id="form-title" class="section-title">Send a referral online</h2><div class="accent-rule mx-auto mt-6"></div></div>
+      <div class="mt-12">
+        <Embed iframe={embeds.referralForm.iframe} script={embeds.referralForm.script} title="Physician referral form">
+          <div class="rounded-md border border-accent/25 bg-white p-10 text-center shadow-xl shadow-navy/10">
+            <p class="text-lg text-muted">To send a referral, call our office or email us your patient's details and we will take it from there.</p>
+            <div class="mt-8 flex flex-wrap justify-center gap-4"><a href={site.phoneHref} class="btn btn-appointment">Call {site.phone}</a><a href={`mailto:${site.email}?subject=Physician%20referral`} class="btn btn-outline">Email a referral</a></div>
+          </div>
+        </Embed>
+      </div>
+    </div>
+  </section>
+  <LocationsSection />
+  <PageCta title="Partner with our team" text="Questions about a referral? We are glad to help." />
+</BaseLayout>

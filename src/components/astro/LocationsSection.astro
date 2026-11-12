@@ -1,0 +1,16 @@
+---
+import LocationsTabs from '../react/LocationsTabs';
+import { locations } from '../../data/locations';
+import { site } from '../../data/content';
+---
+<section class="section-pad bg-ivory" aria-labelledby="all-loc-title" id="locations">
+  <div class="container-x">
+    <div class="mx-auto mb-12 max-w-3xl text-center">
+      <p class="eyebrow">Locations</p>
+      <h2 id="all-loc-title" class="section-title">Find a Choice Pain office near you</h2>
+      <div class="accent-rule mx-auto mt-6"></div>
+      <p class="mt-6 text-lg text-muted">Ten offices across Maryland and Delaware. Call {site.phone} and we will help you book.</p>
+    </div>
+    <LocationsTabs client:visible locations={locations} phone={site.phone} phoneHref={site.phoneHref} email={site.email} />
+  </div>
+</section>

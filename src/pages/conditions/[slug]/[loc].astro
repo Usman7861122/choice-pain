@@ -1,0 +1,16 @@
+---
+import ConditionPageView from '../../../components/astro/ConditionPageView.astro';
+import ConditionGroupView from '../../../components/astro/ConditionGroupView.astro';
+import { conditionPages } from '../../../data/condition-pages';
+import { conditionGroups } from '../../../data/condition-groups';
+import { localAreas } from '../../../data/local-areas';
+export function getStaticPaths() {
+  const locs = Object.keys(localAreas);
+  return [
+    ...Object.values(conditionPages).flatMap((p) => locs.map((loc) => ({ params: { slug: p.slug, loc }, props: { p, loc } }))),
+    ...conditionGroups.flatMap((g) => locs.map((loc) => ({ params: { slug: g.slug, loc }, props: { g, loc } }))),
+  ];
+}
+const { p, g, loc } = Astro.props;
+---
+{g ? <ConditionGroupView g={g} loc={loc} /> : <ConditionPageView p={p} loc={loc} />}

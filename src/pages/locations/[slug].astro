@@ -1,0 +1,7 @@
+---
+import LocationPageView from '../../components/astro/LocationPageView.astro';
+import { locations } from '../../data/locations';
+export function getStaticPaths() { return locations.map((l) => ({ params: { slug: l.slug }, props: { slug: l.slug } })); }
+const { slug } = Astro.props;
+---
+<LocationPageView slug={slug} />

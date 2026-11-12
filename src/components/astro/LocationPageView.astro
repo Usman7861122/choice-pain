@@ -1,0 +1,175 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from './PageHero.astro';
+import PageCta from './PageCta.astro';
+import OfficeHours from './OfficeHours.astro';
+import { locations } from '../../data/locations';
+import { localAreas } from '../../data/local-areas';
+import { providers } from '../../data/providers';
+import { servicePages } from '../../data/service-pages';
+import { conditions } from '../../data/conditions';
+import { treatmentList, treatmentGroups } from '../../data/treatments';
+import { hoursFor } from '../../data/location-hours';
+import { site } from '../../data/content';
+const { slug } = Astro.props;
+const loc = locations.find((l) => l.slug === slug)!;
+const area = localAreas[slug];
+const full = `${loc.address}, ${loc.zip}`;
+const doctors = providers.filter((d) => d.officeSlugs.includes(slug));
+const services = Object.values(servicePages);
+const others = locations.filter((l) => l.slug !== slug);
+const dayCodes = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+const dayFull = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const schema = {
+  '@context': 'https://schema.org', '@type': 'MedicalClinic', name: `${site.name} - ${loc.name}`, telephone: site.phone, email: site.email,
+  url: `https://choicepain.com/locations/${slug}`, medicalSpecialty: 'PainMedicine',
+  address: { '@type': 'PostalAddress', streetAddress: loc.address, addressLocality: loc.zip.split(',')[0], addressRegion: loc.zip.split(', ')[1]?.split(' ')[0], postalCode: loc.zip.split(' ').pop() },
+  openingHoursSpecification: hoursFor(slug).map((h, i) => h && ({ '@type': 'OpeningHoursSpecification', dayOfWeek: dayFull[i], opens: h.open, closes: h.close })).filter(Boolean),
+  employee: doctors.map((d) => ({ '@type': 'Physician', name: d.name })),
+};
+---
+<BaseLayout overlay title={`Pain Management in ${loc.name} | Choice Pain & Rehabilitation Center`} description={`Visit CHOICE Pain & Rehabilitation Center in ${loc.name}: address, phone, working hours, doctors, services, treatments and conditions. Call ${site.phone}.`}>
+  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+  <PageHero eyebrow="Our Office" title={`Pain Management in ${loc.name}`} accent={loc.name} lede={`Advanced, minimally invasive pain care at ${loc.address}. We serve ${area.areas.slice(0, 4).join(', ')} and nearby towns.`} image="/images/stock/2756848849.webp" alt="Doctor explaining a spine model to a patient">
+    <div class="mt-8 flex flex-wrap gap-3"><a href={site.appointmentHref} class="btn btn-appointment">Request Appointment</a><a href={site.phoneHref} class="btn btn-light">Call {site.phone}</a></div>
+  </PageHero>
+
+  <!-- Contact + hours -->
+  <section class="section-pad bg-ivory" aria-labelledby="contact-title" id="contact">
+    <div class="container-x">
+      <div class="mx-auto mb-12 max-w-3xl text-center">
+        <p class="eyebrow">Contact details</p>
+        <h2 id="contact-title" class="section-title">Visit our {area.city} office</h2>
+        <div class="accent-rule mx-auto mt-6"></div>
+      </div>
+      <div class="grid gap-8 lg:grid-cols-2">
+        <div class="rounded-md border border-accent/25 bg-white p-7 shadow-sm">
+          <h3 class="font-display text-3xl text-navy">Contact</h3>
+          <div class="accent-rule mt-4"></div>
+          <dl class="mt-6 space-y-5">
+            <div><dt class="text-xs font-semibold uppercase tracking-[0.2em] text-accent">Address</dt><dd class="mt-1 text-lg text-ink"><address class="not-italic">{loc.address}<br />{loc.zip}</address></dd></div>
+            <div><dt class="text-xs font-semibold uppercase tracking-[0.2em] text-accent">Phone</dt><dd class="mt-1 text-lg"><a class="text-ink hover:text-accent" href={site.phoneHref}>{site.phone}</a></dd></div>
+            <div><dt class="text-xs font-semibold uppercase tracking-[0.2em] text-accent">Email</dt><dd class="mt-1 text-lg"><a class="text-ink hover:text-accent" href={`mailto:${site.email}`}>{site.email}</a></dd></div>
+            <div><dt class="text-xs font-semibold uppercase tracking-[0.2em] text-accent">Areas we serve</dt><dd class="mt-1 text-muted">{area.areas.join(', ')}</dd></div>
+          </dl>
+          <div class="mt-8 flex flex-wrap gap-3">
+            <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(full)}`} target="_blank" rel="noopener noreferrer" class="btn btn-outline">Get Directions</a>
+            <a href={site.phoneHref} class="btn btn-outline">Call Now</a>
+            <a href={`${site.appointmentHref}?location=${slug}`} class="btn btn-appointment">Request Appointment</a>
+          </div>
+        </div>
+        <OfficeHours slug={slug} />
+      </div>
+      <iframe title={`Map of ${loc.name} office`} src={`https://maps.google.com/maps?q=${encodeURIComponent(full)}&z=15&output=embed`} loading="lazy" referrerpolicy="no-referrer-when-downgrade" class="mt-8 h-80 w-full rounded-md border border-accent/25"></iframe>
+    </div>
+  </section>
+
+  <!-- Doctors -->
+  <section class="section-pad bg-cream" aria-labelledby="doc-title" id="doctors">
+    <div class="container-x">
+      <div class="mx-auto mb-12 max-w-3xl text-center">
+        <p class="eyebrow">Our team</p>
+        <h2 id="doc-title" class="section-title">{doctors.length ? `Doctors available in ${loc.name.split(',')[0]}` : 'Our providers'}</h2>
+        <div class="accent-rule mx-auto mt-6"></div>
+        <p class="mt-6 text-lg text-muted">{doctors.length ? 'Choose the provider who fits your needs, or call us and we will help you book.' : `Call ${site.phone} to ask which provider is in the ${area.city} office. Our whole team is listed below.`}</p>
+      </div>
+      <ul class={`mx-auto grid gap-8 ${doctors.length === 1 ? 'max-w-sm' : doctors.length === 2 ? 'max-w-3xl md:grid-cols-2' : 'md:grid-cols-3'}`}>
+        {(doctors.length ? doctors : providers).map((d) => (
+          <li>
+            <article class="group h-full overflow-hidden rounded-md border border-accent/25 bg-white shadow-sm transition duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-navy/15">
+              <a href={`/providers/${d.slug}`} class="block" aria-label={`View ${d.name}`}>
+                <div class="aspect-square overflow-hidden bg-gradient-to-br from-navy-800 to-navy-700"><img src={d.img} alt={d.name} loading="lazy" class="h-full w-full object-cover object-top transition duration-[1200ms] group-hover:scale-105" /></div>
+              </a>
+              <div class="p-6 text-center">
+                <h3 class="text-2xl text-navy"><a href={`/providers/${d.slug}`}>{d.name}</a></h3>
+                <p class="mt-1 text-xs font-medium uppercase tracking-[0.2em] text-accent">{d.role}</p>
+                <div class="mt-5 flex flex-wrap justify-center gap-3"><a href={`/providers/${d.slug}`} class="btn btn-outline">View Profile</a><a href={site.appointmentHref} class="btn btn-appointment">Book</a></div>
+              </div>
+            </article>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <!-- Services -->
+  <section class="section-pad bg-ivory" aria-labelledby="svc-title" id="services">
+    <div class="container-x">
+      <div class="mx-auto mb-12 max-w-3xl text-center">
+        <p class="eyebrow">Services</p>
+        <h2 id="svc-title" class="section-title">Services at our {area.city} office</h2>
+        <div class="accent-rule mx-auto mt-6"></div>
+      </div>
+      <ul class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {services.map((s) => (
+          <li>
+            <a href={`/services/${s.slug}/${slug}`} class="group flex h-full flex-col overflow-hidden rounded-md border border-accent/25 bg-white shadow-sm transition duration-500 hover:-translate-y-1 hover:shadow-xl hover:shadow-navy/15">
+              <div class="aspect-[16/10] overflow-hidden"><img src={s.photos[0].img} data-photo-status="repeated" alt={s.photos[0].alt} loading="lazy" class="h-full w-full object-cover transition duration-[1200ms] group-hover:scale-105" /></div>
+              <div class="flex flex-1 flex-col p-6">
+                <h3 class="font-display text-2xl text-navy">{s.title}</h3>
+                <p class="mt-2 flex-1 text-muted">{s.summary}</p>
+                <span class="mt-5 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-accent">{s.title} in {area.city} <span aria-hidden="true" class="transition-transform duration-300 group-hover:translate-x-1">→</span></span>
+              </div>
+            </a>
+          </li>
+        ))}
+      </ul>
+      <div class="mt-10 text-center"><a href="/services" class="btn btn-outline">View all services</a></div>
+    </div>
+  </section>
+
+  <!-- Treatments -->
+  <section class="section-pad relative bg-navy text-white" aria-labelledby="tx-title" id="treatments">
+    <div class="container-x">
+      <div class="mx-auto mb-12 max-w-3xl text-center">
+        <p class="eyebrow !text-accent-light">Treatment</p>
+        <h2 id="tx-title" class="section-title !text-white">Treatments offered in {area.city}</h2>
+        <div class="accent-rule mx-auto mt-6"></div>
+      </div>
+      <div class="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
+        {treatmentGroups.map((g) => (
+          <div>
+            <h3 class="font-display text-xl text-accent-light">{g}</h3>
+            <ul class="mt-3 divide-y divide-white/15">
+              {treatmentList.filter((t) => t.group === g).map((t) => (
+                <li><a href={`/treatment/${t.slug}/${slug}`} class="group flex items-center justify-between gap-3 py-2.5 text-white/85 transition hover:text-white">{t.title}<span aria-hidden="true" class="transition-transform duration-300 group-hover:translate-x-1">→</span></a></li>
+              ))}
+              {g === treatmentGroups[3] && <li><a href={`/genicular-artery-embolization/${slug}`} class="group flex items-center justify-between gap-3 py-2.5 text-white/85 transition hover:text-white">Genicular Artery Embolization (GAE)<span aria-hidden="true" class="transition-transform duration-300 group-hover:translate-x-1">→</span></a></li>}
+            </ul>
+          </div>
+        ))}
+      </div>
+      <div class="mt-10 flex flex-wrap justify-center gap-4"><a href="/treatment" class="btn btn-light">View all treatments</a><a href={site.appointmentHref} class="btn btn-appointment">Request Appointment</a></div>
+    </div>
+  </section>
+
+  <!-- Conditions -->
+  <section class="section-pad bg-cream" aria-labelledby="cond-title" id="conditions">
+    <div class="container-x">
+      <div class="mx-auto mb-12 max-w-3xl text-center">
+        <p class="eyebrow">Conditions</p>
+        <h2 id="cond-title" class="section-title">Conditions we treat in {area.city}</h2>
+        <div class="accent-rule mx-auto mt-6"></div>
+      </div>
+      <ul class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {conditions.map((c) => (
+          <li><a href={`/conditions/${c.slug}/${slug}`} class="group flex items-center justify-between gap-3 rounded-md border border-accent/25 bg-white px-5 py-4 text-navy transition duration-300 hover:border-accent hover:bg-accent hover:text-white">{c.title}<span aria-hidden="true" class="transition-transform duration-300 group-hover:translate-x-1">→</span></a></li>
+        ))}
+      </ul>
+      <div class="mt-10 flex flex-wrap justify-center gap-4"><a href="/conditions" class="btn btn-outline">View all conditions</a><a href={site.phoneHref} class="btn btn-appointment">Call {site.phone}</a></div>
+    </div>
+  </section>
+
+  <!-- Other offices -->
+  <section class="section-pad bg-ivory" aria-labelledby="oth-title">
+    <div class="container-x text-center">
+      <p class="eyebrow">Other offices</p>
+      <h2 id="oth-title" class="section-title">Visit another location</h2>
+      <div class="accent-rule mx-auto mt-6"></div>
+      <ul class="mt-8 flex flex-wrap justify-center gap-3">
+        {others.map((l) => <li><a href={`/locations/${l.slug}`} class="btn btn-outline">{l.name}</a></li>)}
+      </ul>
+    </div>
+  </section>
+  <PageCta title={`Ready to visit our ${area.city} office?`} />
+</BaseLayout>

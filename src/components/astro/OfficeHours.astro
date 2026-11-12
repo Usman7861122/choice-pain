@@ -1,0 +1,53 @@
+---
+import { hoursFor, dayNames, fmt, officeTimeZone } from '../../data/location-hours';
+const { slug } = Astro.props;
+const hours = hoursFor(slug);
+const order = [1, 2, 3, 4, 5, 6, 0]; // Monday first
+---
+<div data-office-hours data-tz={officeTimeZone} class="rounded-md border border-accent/25 bg-white p-7 shadow-sm">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <h3 class="font-display text-3xl text-navy">Working hours</h3>
+    <span data-status class="hidden items-center gap-2 rounded-full bg-navy/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-navy"><span data-dot class="h-2 w-2 rounded-full bg-muted"></span><span data-status-text></span></span>
+  </div>
+  <div class="accent-rule mt-4"></div>
+  <ul class="mt-5">
+    {order.map((d) => {
+      const h = hours[d];
+      return (
+        <li data-day={d} data-open={h?.open} data-close={h?.close} class="hours-row flex items-center justify-between gap-4 rounded-sm border-b border-accent/15 px-3 py-3 last:border-b-0">
+          <span class="flex items-center gap-3 font-medium text-navy">{dayNames[d]}<span data-today-tag class="hidden rounded-full bg-accent px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-white">Today</span></span>
+          <span class="text-muted">{h ? `${fmt(h.open)} – ${fmt(h.close)}` : 'Closed'}</span>
+        </li>
+      );
+    })}
+  </ul>
+  <p class="mt-4 text-sm text-muted">Hours may change on holidays. Please call to confirm.</p>
+</div>
+<style>
+  .hours-row.is-today { background: color-mix(in srgb, var(--color-accent) 10%, white); box-shadow: inset 3px 0 0 var(--color-accent); }
+  .hours-row.is-today span { color: var(--color-navy); font-weight: 600; }
+</style>
+<script>
+  // Highlights today's row in the office's own time zone and shows Open / Closed now.
+  document.querySelectorAll<HTMLElement>('[data-office-hours]').forEach((box) => {
+    const tz = box.dataset.tz || 'America/New_York';
+    const parts = new Intl.DateTimeFormat('en-US', { timeZone: tz, weekday: 'short', hour: 'numeric', minute: 'numeric', hourCycle: 'h23' }).formatToParts(new Date());
+    const get = (t: string) => parts.find((p) => p.type === t)?.value || '';
+    const day = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(get('weekday'));
+    const mins = Number(get('hour')) * 60 + Number(get('minute'));
+    const row = box.querySelector<HTMLElement>(`[data-day="${day}"]`);
+    if (!row) return;
+    row.classList.add('is-today');
+    row.setAttribute('aria-current', 'date');
+    row.querySelector('[data-today-tag]')?.classList.replace('hidden', 'inline-block');
+    const toMin = (t?: string) => { if (!t) return null; const [h, m] = t.split(':').map(Number); return h * 60 + m; };
+    const o = toMin(row.dataset.open), c = toMin(row.dataset.close);
+    const isOpen = o !== null && c !== null && mins >= o && mins < c;
+    const status = box.querySelector<HTMLElement>('[data-status]');
+    if (status) {
+      status.classList.replace('hidden', 'inline-flex');
+      status.querySelector('[data-status-text]')!.textContent = isOpen ? 'Open now' : 'Closed now';
+      status.querySelector('[data-dot]')!.className = `h-2 w-2 rounded-full ${isOpen ? 'bg-green-600' : 'bg-accent'}`;
+    }
+  });
+</script>

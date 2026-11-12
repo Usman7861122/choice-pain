@@ -1,0 +1,31 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/astro/PageHero.astro';
+import PageCta from '../../components/astro/PageCta.astro';
+import LocationsSection from '../../components/astro/LocationsSection.astro';
+import { locations } from '../../data/locations';
+import { localAreas } from '../../data/local-areas';
+import { site } from '../../data/content';
+---
+<BaseLayout overlay title="Locations | Choice Pain & Rehabilitation Center" description="Ten Choice Pain offices in Maryland and Delaware. Find addresses, hours, doctors and call (240) 786-1001.">
+  <PageHero eyebrow="Locations · Maryland & Delaware" title="Our Locations" accent="Locations" lede="Ten offices across Maryland and Delaware. Pick the one closest to you to see hours, doctors and the care we offer there." image="/images/stock/2756848849.webp" alt="Doctor explaining a spine model to a patient">
+    <div class="mt-8 flex flex-wrap gap-3"><a href={site.appointmentHref} class="btn btn-appointment">Request Appointment</a><a href={site.phoneHref} class="btn btn-light">Call {site.phone}</a></div>
+  </PageHero>
+  <section class="section-pad bg-ivory">
+    <div class="container-x">
+      <ul class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {locations.map((l) => (
+          <li><a href={`/locations/${l.slug}`} class="group flex h-full flex-col rounded-md border border-accent/25 bg-white p-7 shadow-sm transition duration-500 hover:-translate-y-1 hover:shadow-xl hover:shadow-navy/15">
+            <h2 class="font-display text-3xl text-navy">{l.name}</h2>
+            <div class="accent-rule mt-3"></div>
+            <address class="mt-4 not-italic text-ink">{l.address}<br />{l.zip}</address>
+            <p class="mt-3 text-sm text-muted">Serves {localAreas[l.slug].areas.slice(0, 3).join(', ')} and more</p>
+            <span class="mt-auto pt-6 text-xs font-semibold uppercase tracking-[0.2em] text-accent">View office page <span class="inline-block transition-transform duration-300 group-hover:translate-x-1">→</span></span>
+          </a></li>
+        ))}
+      </ul>
+    </div>
+  </section>
+  <LocationsSection />
+  <PageCta />
+</BaseLayout>

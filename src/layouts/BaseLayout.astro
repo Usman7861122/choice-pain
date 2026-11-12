@@ -1,0 +1,49 @@
+---
+import '../styles/global.css';
+import Header from '../components/react/Header';
+import Footer from '../components/astro/Footer.astro';
+import CookieConsent from '../components/react/CookieConsent';
+import { site } from '../data/content';
+import { locations } from '../data/locations';
+
+interface Props { title: string; description?: string; overlay?: boolean }
+const { title, overlay = false, description = 'CHOICE Pain & Rehabilitation Center offers advanced, minimally invasive pain management across Maryland and Delaware. Request an appointment today.' } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://choicepain.com');
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'MedicalBusiness',
+  name: site.name,
+  url: 'https://choicepain.com',
+  telephone: site.phone,
+  email: site.email,
+  medicalSpecialty: 'PainMedicine',
+  areaServed: ['Maryland', 'Delaware'],
+  location: locations.map((l) => ({ '@type': 'MedicalClinic', name: `${site.short} ${l.name}`, address: `${l.address}, ${l.zip}` })),
+};
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta name="theme-color" content="#0b1f3a" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&amp;family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&amp;display=swap" rel="stylesheet" />
+    <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+  </head>
+  <body>
+    <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded focus:bg-white focus:px-4 focus:py-2">Skip to content</a>
+    <Header client:load overlay={overlay} />
+    <main id="main"><slot /></main>
+    <Footer />
+    <CookieConsent client:idle />
+  </body>
+</html>

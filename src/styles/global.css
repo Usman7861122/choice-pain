@@ -1,0 +1,127 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  --color-ivory: #faf7f2;
+  --color-cream: #f2ece1;
+  --color-navy: #0b1f3a;
+  --color-navy-800: #12294a;
+  --color-navy-700: #1b3760;
+  --color-accent: #b74848;
+  --color-accent-light: #ea8f8f;
+  --color-ink: #1b2433;
+  --color-muted: #5b6577;
+  --ease-lux: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@property --angle { syntax: "<angle>"; initial-value: 0deg; inherits: false; }
+
+html { scroll-behavior: smooth; }
+body { @apply bg-ivory font-sans text-ink antialiased; font-size: 17px; line-height: 1.6; }
+h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.01em; font-weight: 400 !important; line-height: 1.08; }
+.font-display { font-weight: 500; }
+h1.eyebrow { font-family: var(--font-sans); }
+h1.eyebrow, .eyebrow { font-weight: 500; }
+
+/* Hero rotating word */
+.hero-word { font-style: italic; background: linear-gradient(100deg, #ffb4a8 0%, #ff8a7a 35%, #f6c177 70%, #ffd9a0 100%); background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: word-shine 5s ease-in-out infinite alternate; padding: 0 0.08em 0.16em 0; margin-bottom: -0.16em; line-height: 1.2; }
+@keyframes word-shine { to { background-position: 100% 0; } }
+@media (prefers-reduced-motion: reduce) { .hero-word { animation: none; } }
+
+.container-x { @apply mx-auto w-full max-w-7xl px-5 sm:px-8; }
+.section-pad { @apply py-20 md:py-28; }
+.eyebrow { @apply inline-flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.25em] text-accent; }
+.eyebrow::before { content: ""; width: 2.25rem; height: 1px; background: currentColor; }
+.section-title { @apply mt-4 text-3xl font-semibold leading-tight text-navy md:text-5xl; }
+.accent-rule { width: 64px; height: 2px; background: linear-gradient(90deg, var(--color-accent), var(--color-accent-light)); }
+
+/* Buttons: slightly rounded, sleek border, hover fill */
+.btn { @apply relative inline-flex min-h-11 items-center justify-center gap-2 overflow-hidden rounded-md border px-6 py-3 text-sm font-semibold tracking-wide transition-all duration-500; }
+.btn:focus-visible { outline: 2px solid var(--color-accent-light); outline-offset: 3px; }
+.btn-outline { @apply border-accent text-navy; background: transparent; }
+.btn-outline::after { content: ""; position: absolute; inset: 0; background: var(--color-accent); transform: translateY(101%); transition: transform .5s var(--ease-lux); z-index: -1; }
+.btn-outline:hover { color: #fff; }
+.btn-outline:hover::after { transform: translateY(0); }
+.btn-outline { isolation: isolate; }
+.btn-light { @apply border-white/60 text-white; isolation: isolate; }
+.btn-light::after { content: ""; position: absolute; inset: 0; background: #fff; transform: translateY(101%); transition: transform .5s var(--ease-lux); z-index: -1; }
+.btn-light:hover { color: var(--color-navy); }
+.btn-light:hover::after { transform: translateY(0); }
+.btn-accent { @apply border-accent bg-accent text-white; }
+.btn-accent:hover { background: var(--color-navy); border-color: var(--color-navy); }
+
+/* Appointment button: animated accent border */
+.btn-appointment { @apply rounded-md border-transparent bg-navy text-white; border-width: 0; padding: 0.8rem 1.6rem; position: relative; }
+.btn-appointment::before {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1.5px;
+  background: conic-gradient(from var(--angle), transparent 0deg, var(--color-accent-light) 80deg, transparent 170deg, transparent 360deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  animation: spin-angle 3s linear infinite;
+}
+.btn-appointment::after { content: ""; position: absolute; inset: 1.5px; border-radius: 4px; box-shadow: inset 0 0 0 1px rgba(217,184,115,.25); }
+.btn-appointment:hover { background: var(--color-navy-700); transform: translateY(-1px); box-shadow: 0 10px 30px -10px rgba(11,31,58,.6); }
+@keyframes spin-angle { to { --angle: 360deg; } }
+
+/* Images: square, slightly rounded */
+.img-sq { @apply aspect-square w-full rounded-md object-cover; }
+
+/* Fixed parallax window */
+.parallax { background-attachment: fixed; background-size: cover; background-position: center; }
+@media (max-width: 1024px) { .parallax { background-attachment: scroll; } }
+
+/* Logo marquee */
+@keyframes marquee { to { transform: translateX(-50%); } }
+.marquee-track { animation: marquee 40s linear infinite; width: max-content; }
+.marquee:hover .marquee-track { animation-play-state: paused; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .btn-appointment::before, .marquee-track { animation: none; }
+  .parallax { background-attachment: scroll; }
+}
+
+/* Logo load animation: icon spins in, ring pulses, wordmark wipes in */
+.logo { position: relative; display: inline-block; aspect-ratio: 455 / 149; }
+.logo img { position: absolute; display: block; }
+.logo-base { inset: 0; width: 100%; height: 100%; animation: logo-wipe 1.1s var(--ease-lux) .1s both; }
+.logo-icon { left: 38.9%; top: 14.77%; width: 17.8%; height: 54.4%; transform-origin: 50% 50%; animation: logo-icon-in 1.7s var(--ease-lux) .25s both; }
+.logo-ring { position: absolute; left: 38.9%; top: 14.77%; width: 17.8%; height: 54.4%; border: 2px solid var(--color-accent-light); border-radius: 9999px; opacity: 0; pointer-events: none; animation: logo-ring 1.5s ease-out 1.1s both; }
+@keyframes logo-wipe { from { clip-path: inset(0 100% 0 0); opacity: .4; } to { clip-path: inset(0 0 0 0); opacity: 1; } }
+@keyframes logo-icon-in { 0% { opacity: 0; transform: rotate(-270deg) scale(.1); } 55% { opacity: 1; transform: rotate(14deg) scale(1.22); } 80% { transform: rotate(-4deg) scale(.96); } 100% { opacity: 1; transform: rotate(0) scale(1); } }
+@keyframes logo-ring { 0% { opacity: .9; transform: scale(1); } 100% { opacity: 0; transform: scale(2.1); } }
+@media (prefers-reduced-motion: reduce) { .logo-base, .logo-icon, .logo-ring { animation: none; } }
+
+/* ---- Site-wide hover effects (images + boxes). Desktop only, off for reduced motion ---- */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  /* Photos: slow zoom inside their frame, soft lift on the frame */
+  main div.overflow-hidden > img:not([class*="group-hover"]),
+  main figure > img:not([class*="group-hover"]) {
+    transition: scale 1.2s var(--ease-lux, cubic-bezier(0.22, 1, 0.36, 1)), filter 0.8s ease;
+  }
+  main div.overflow-hidden:hover > img:not([class*="group-hover"]),
+  main figure:hover > img:not([class*="group-hover"]) { scale: 1.06; filter: saturate(1.08) contrast(1.02); }
+  main div.overflow-hidden.rounded-md:has(> img),
+  main div.overflow-hidden.img-sq:has(> img) { transition: box-shadow 0.6s ease, translate 0.6s var(--ease-lux, ease); }
+  main div.overflow-hidden.rounded-md:has(> img):hover { translate: 0 -4px; box-shadow: 0 30px 60px -20px rgba(11, 31, 58, 0.45); }
+
+  /* Boxes and cards: lift, red edge glow, deeper shadow */
+  main [class*="border-accent/25"]:not(:has(details, iframe, ol, [role="tablist"])):not([class*="hover:-translate"]) {
+    transition: translate 0.5s var(--ease-lux, ease), box-shadow 0.5s ease, border-color 0.4s ease;
+  }
+  main [class*="border-accent/25"]:not(:has(details, iframe, ol, [role="tablist"])):not([class*="hover:-translate"]):hover {
+    translate: 0 -6px; border-color: rgba(183, 72, 72, 0.7);
+    box-shadow: 0 28px 55px -22px rgba(11, 31, 58, 0.35), 0 0 0 1px rgba(183, 72, 72, 0.15);
+  }
+  /* Glass boxes on dark sections: brighten */
+  main [class*="backdrop-blur"][class*="border-white"]:hover { border-color: rgba(255, 255, 255, 0.4); translate: 0 -4px; }
+  main [class*="backdrop-blur"][class*="border-white"] { transition: translate 0.5s var(--ease-lux, ease), border-color 0.4s ease, background-color 0.4s ease; }
+}
+
+/* Scrollable panel with a slim, elegant scrollbar on the right */
+.scroll-panel { scrollbar-width: thin; scrollbar-color: #B74848 #f3ece4; overscroll-behavior: contain; }
+.scroll-panel::-webkit-scrollbar { width: 8px; }
+.scroll-panel::-webkit-scrollbar-track { background: #f3ece4; border-radius: 8px; margin: 8px 0; }
+.scroll-panel::-webkit-scrollbar-thumb { background: #B74848; border-radius: 8px; }
+.scroll-panel:focus-visible { outline: 2px solid #B74848; outline-offset: 2px; }

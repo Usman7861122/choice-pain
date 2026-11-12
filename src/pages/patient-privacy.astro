@@ -1,0 +1,69 @@
+---
+import LocationsSection from '../components/astro/LocationsSection.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/astro/PageHero.astro';
+import PageCta from '../components/astro/PageCta.astro';
+import { site } from '../data/content';
+import { heroSlides } from '../data/images';
+const rights = [
+  'Respectful, skilled care in a safe place, free from discrimination',
+  'Know the names of your providers',
+  'Physical privacy that fits your care',
+  'Clear information about your diagnosis, treatment and outlook, with an interpreter or helper if you need one',
+  'Informed consent, including the alternatives, risks and expected results (except in emergencies)',
+  'Make advance directives and name someone to make health decisions for you',
+  'Refuse treatment and be told what could happen',
+  'Complete discharge instructions and reasonable continuity of care',
+  'Confidentiality of your medical records and care',
+  'Take part in referrals to other providers',
+  'See your medical record, with limited exceptions such as some sensitive materials',
+  'File a written complaint without fear of retaliation',
+];
+const duties = [
+  'Keep appointments, or cancel in advance',
+  'Follow your treatment plan',
+  'Take an active role in your care and ask questions',
+  'Give accurate information and keep your details up to date',
+  'Treat staff and other patients with respect and protect their privacy',
+  'Report anything that seems unsafe',
+  'Pay your bills promptly',
+];
+---
+<BaseLayout overlay title="Patient Privacy & Rights | Choice Pain & Rehabilitation Center" description="Your rights and responsibilities as a patient of CHOICE Pain & Rehabilitation Center.">
+  <PageHero eyebrow="Patient Privacy" title="Your rights, your privacy, your care" lede="We respect every patient as an individual and support your right to take part in decisions about your health." image={heroSlides[0].img} alt="" />
+  <section class="section-pad bg-ivory">
+    <div class="container-x grid gap-10 lg:grid-cols-[1.4fr_1fr]">
+      <div class="relative overflow-hidden rounded-md border border-accent/25 bg-white p-8 shadow-xl shadow-navy/10 md:p-10">
+        <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-accent via-accent-light to-accent"></div>
+        <p class="eyebrow">Patient Rights</p>
+        <h2 class="mt-3 font-display text-4xl text-navy md:text-5xl">You have the right to</h2>
+        <ol class="mt-8 space-y-4">
+          {rights.map((r, i) => (
+            <li class="group flex gap-4">
+              <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-navy font-display text-lg text-accent-light transition group-hover:bg-accent group-hover:text-white">{i + 1}</span>
+              <p class="pt-1 text-muted transition group-hover:text-navy">{r}</p>
+            </li>
+          ))}
+        </ol>
+      </div>
+      <div class="space-y-10 lg:sticky lg:top-28 lg:self-start">
+        <div class="relative overflow-hidden rounded-md bg-navy p-8 text-white shadow-xl shadow-navy/20">
+          <div class="pointer-events-none absolute -right-16 -top-16 h-52 w-52 rounded-full bg-accent/30 blur-3xl"></div>
+          <p class="eyebrow relative !text-accent-light">Your Part</p>
+          <h2 class="relative mt-3 font-display text-4xl font-light">Patient responsibilities</h2>
+          <p class="relative mt-4 text-white/75">Following our office protocols helps keep everyone safe and supports good results.</p>
+          <ul class="relative mt-6 space-y-3">
+            {duties.map((d) => (<li class="flex gap-3 text-white/90"><svg class="mt-1 h-4 w-4 shrink-0 text-accent-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.500 10 17.500 19 7"/></svg>{d}</li>))}
+          </ul>
+        </div>
+        <div class="rounded-md border border-accent/25 bg-cream p-8">
+          <h3 class="font-display text-3xl text-navy">Have a concern?</h3>
+          <p class="mt-3 text-muted">If you feel you were treated unfairly or improperly, please talk with your physician or the office manager. Our goal is to keep you in the best health possible.</p>
+          <p class="mt-4"><a class="font-medium text-accent hover:underline" href={site.phoneHref}>{site.phone}</a><br /><a class="text-sm text-muted hover:underline" href={`mailto:${site.email}`}>{site.email}</a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <LocationsSection />
+  <PageCta />
+</BaseLayout>

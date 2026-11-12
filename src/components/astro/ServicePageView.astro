@@ -1,0 +1,205 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from './PageHero.astro';
+import PageCta from './PageCta.astro';
+import FadeIn from '../react/FadeIn';
+import LocationsTabs from '../react/LocationsTabs';
+import ServicesGrid from '../react/ServicesGrid';
+import { servicePages } from '../../data/service-pages';
+import { featuredServices } from '../../data/services';
+import { serviceImages } from '../../data/images';
+import { locations } from '../../data/locations';
+import { site } from '../../data/content';
+import { localAreas } from '../../data/local-areas';
+import { providers } from '../../data/providers';
+const { p, loc: locSlug } = Astro.props;
+const loc = locSlug ? locations.find((l) => l.slug === locSlug) : undefined;
+const local = locSlug ? localAreas[locSlug] : undefined;
+const here = loc && local;
+const seenBy = here ? providers.filter((d) => d.officeSlugs.includes(loc!.slug)) : [];
+const base = `/services/${p.slug}`;
+// TEMPORARY Unsplash photos (13-digit IDs). See scripts/UNSPLASH-TEMP-PHOTOS.md
+// People photos (doctors and patients), one per office, so cards never look like a picture of the real building.
+const officePeople = ['1686771416282', '1631217868264', '1758691461990', '1758691462321', '1765896387387', '1758691462071', '1758691462878', '1765896387398', '1659353888906', '1637059824899'];
+const officeImg = (i: number) => `/images/stock/${officePeople[i % officePeople.length]}.webp`;
+const localPages = Object.keys(localAreas).map((k) => locations.find((l) => l.slug === k)!);
+const metaTitle = here ? `${p.title} in ${loc!.name} | Choice Pain & Rehabilitation Center` : p.metaTitle;
+const metaDescription = here ? `${p.title} in ${loc!.name}. ${p.summary} Call ${site.phone}.` : p.metaDescription;
+const h1 = here ? `${p.title} in ${local!.city}` : p.title;
+const eyebrow = here ? `Treatments · ${loc!.name}` : 'Treatments · Maryland & Delaware';
+const lede = here ? `${p.lede} Patients come to our ${local!.city} office from ${local!.areas.slice(0, 4).join(', ')} and nearby.` : p.lede;
+const list = (a: string[]) => (a.length > 1 ? `${a.slice(0, -1).join(', ')} and ${a[a.length - 1]}` : a[0]);
+const strip = here
+  ? `Patients are welcome from across ${list(local!.areas)} and the greater ${local!.city} area.`
+  : `Patients are welcome from across Maryland and Delaware, including ${list(['Hyattsville', 'Gaithersburg', 'Baltimore', 'Newark', 'Milford'])} and the surrounding areas.`;
+const full = here ? `${loc!.address}, ${loc!.zip}` : '';
+const fix = "this.onerror=null;this.src=this.dataset.fb";
+const others = featuredServices.filter((x) => x.slug !== p.slug).map((x) => ({ ...x, img: serviceImages[x.slug] }));
+const faqSchema = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: p.faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) };
+const medSchema = { '@context': 'https://schema.org', '@type': 'MedicalProcedure', name: p.title, description: metaDescription, procedureType: 'https://schema.org/PercutaneousProcedure' };
+---
+<BaseLayout overlay title={metaTitle} description={metaDescription}>
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(medSchema)} />
+  <PageHero eyebrow={eyebrow} title={h1} accent={here ? local!.city : undefined} strip={strip} lede={lede} image={p.photos[0].img} fallback={p.photos[0].fallback} alt={p.photos[0].alt}>
+    <div class="mt-8 flex flex-wrap gap-3"><a href={site.appointmentHref} class="btn btn-appointment">Request Appointment</a><a href={site.phoneHref} class="btn btn-light">Call {site.phone}</a></div>
+  </PageHero>
+
+  <section class="section-pad bg-ivory" aria-labelledby="what-title">
+    <div class="container-x grid items-center gap-14 lg:grid-cols-2 lg:gap-20">
+      <FadeIn client:visible>
+        <p class="eyebrow">Overview</p>
+        <h2 id="what-title" class="section-title mt-3">{p.whatIs.title}</h2>
+        <div class="accent-rule mt-6"></div>
+        {p.whatIs.text.map((t) => <p class="mt-5 text-lg leading-relaxed text-muted">{t}</p>)}
+      </FadeIn>
+      <div class="overflow-hidden rounded-md shadow-2xl shadow-navy/20"><img data-temp-photo="unsplash" src={p.photos[1].img} data-fb={p.photos[1].fallback} onerror={fix} alt={p.photos[1].alt} class="aspect-[4/5] w-full object-cover" loading="lazy" /></div>
+    </div>
+  </section>
+
+  <section class="section-pad relative isolate overflow-hidden bg-navy text-white" aria-labelledby="cand-title">
+    <div class="container-x grid items-center gap-14 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20">
+      <div class="overflow-hidden rounded-md shadow-2xl shadow-black/40"><img data-temp-photo="unsplash" src={p.photos[2].img} data-fb={p.photos[2].fallback} onerror={fix} alt={p.photos[2].alt} class="aspect-[4/5] w-full object-cover" loading="lazy" /></div>
+      <div>
+        <p class="eyebrow !text-accent-light">Candidates</p>
+        <h2 id="cand-title" class="mt-3 font-display text-4xl text-white md:text-5xl">{p.candidates.title}</h2>
+        <div class="accent-rule mt-6"></div>
+        <p class="mt-6 text-lg leading-relaxed text-white/80">{p.candidates.text}</p>
+        <div class="mt-10 grid gap-6 sm:grid-cols-2">
+          {[['Conditions treated', p.candidates.conditions], ['Common symptoms', p.candidates.symptoms]].map(([h, list]) => (
+            <div class="rounded-md border border-white/15 bg-gradient-to-br from-white/10 to-white/[0.03] p-7 backdrop-blur-md">
+              <h3 class="font-display text-2xl text-accent-light">{h}</h3>
+              <ul class="mt-4 space-y-3">{(list as string[]).map((i) => <li class="flex gap-3 text-white/85"><span class="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent-light"></span>{i}</li>)}</ul>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-pad bg-cream" aria-labelledby="ben-title">
+    <div class="container-x">
+      <div class="mx-auto max-w-3xl text-center"><p class="eyebrow">Benefits</p><h2 id="ben-title" class="section-title">{p.benefits.title}</h2><div class="accent-rule mx-auto mt-6"></div><p class="mt-6 text-lg text-muted">{p.benefits.text}</p></div>
+      <div class="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {p.benefits.items.map((b, i) => (
+          <FadeIn client:visible delay={i * 0.1}>
+            <div class="h-full rounded-md border border-accent/25 bg-white p-8 transition duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-navy/15">
+              <span class="font-display text-5xl text-accent/40">0{i + 1}</span>
+              <h3 class="mt-3 font-display text-2xl text-navy">{b.title}</h3>
+              <p class="mt-3 text-muted">{b.text}</p>
+            </div>
+          </FadeIn>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section-pad bg-ivory" aria-labelledby="rec-title">
+    <div class="container-x grid gap-14 lg:grid-cols-2 lg:gap-20">
+      <div><p class="eyebrow">Recovery</p><h2 id="rec-title" class="section-title mt-3">{p.recovery.title}</h2><div class="accent-rule mt-6"></div><p class="mt-6 text-lg leading-relaxed text-muted">{p.recovery.text}</p></div>
+      <ol class="relative space-y-8 border-l border-accent/30 pl-8">
+        {p.recovery.steps.map((st) => (
+          <li class="relative">
+            <span class="absolute -left-[41px] top-1 h-4 w-4 rounded-full border-2 border-accent bg-ivory"></span>
+            <p class="text-xs font-semibold uppercase tracking-[0.22em] text-accent">{st.label}</p>
+            <h3 class="mt-1 font-display text-2xl text-navy">{st.title}</h3>
+            <p class="mt-2 text-muted">{st.text}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="section-pad bg-cream" aria-labelledby="faq-title">
+    <div class="container-x grid gap-14 lg:grid-cols-2 lg:gap-20">
+      <div>
+        <p class="eyebrow">Safety</p><h2 class="section-title mt-3">{p.safety.title}</h2><div class="accent-rule mt-6"></div>
+        {p.safety.text.map((t) => <p class="mt-5 text-lg leading-relaxed text-muted">{t}</p>)}
+      </div>
+      <div>
+        <p class="eyebrow">FAQ</p><h2 id="faq-title" class="section-title mt-3">Common questions</h2>
+        <div class="mt-8 divide-y divide-accent/20 rounded-md border border-accent/25 bg-white">
+          {p.faqs.map((f) => (
+            <details class="group p-6"><summary class="flex cursor-pointer list-none items-center justify-between gap-4 font-display text-xl text-navy">{f.q}<span class="text-2xl text-accent transition group-open:rotate-45" aria-hidden="true">+</span></summary><p class="mt-3 text-muted">{f.a}</p></details>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {here ? (
+    <section class="section-pad bg-ivory" aria-labelledby="loc-title" id="locations">
+      <div class="container-x">
+        <div class="mx-auto mb-12 max-w-3xl text-center">
+          <p class="eyebrow">Near You</p>
+          <h2 id="loc-title" class="section-title">{p.title} in {loc!.name}</h2>
+          <div class="accent-rule mx-auto mt-6"></div>
+          <p class="mt-6 text-lg text-muted">We see patients for {p.title} at our {local!.city} office and serve {local!.areas.join(', ')}.</p>
+        </div>
+        <div class="grid overflow-hidden rounded-md border border-accent/30 bg-white shadow-xl shadow-navy/10 md:grid-cols-[1fr_1.3fr]">
+          <div class="flex flex-col justify-between p-8 md:p-10">
+            <div>
+              <p class="eyebrow">Our office</p>
+              <h3 class="mt-3 font-display text-4xl text-navy">{loc!.name}</h3>
+              <div class="accent-rule mt-4"></div>
+              <address class="mt-6 text-lg not-italic leading-relaxed text-ink">{loc!.address}<br />{loc!.zip}</address>
+              <dl class="mt-6 space-y-3">
+                <div><dt class="font-semibold text-navy">Phone</dt><dd><a class="text-muted hover:text-accent" href={site.phoneHref}>{site.phone}</a></dd></div>
+                <div><dt class="font-semibold text-navy">Hours</dt><dd class="text-muted">Call the office to confirm hours</dd></div>
+                {seenBy.length > 0 && <div><dt class="font-semibold text-navy">Providers</dt><dd class="text-muted">{seenBy.map((d, i) => <><a class="hover:text-accent" href={`/providers/${d.slug}`}>{d.name}</a>{i < seenBy.length - 1 ? ', ' : ''}</>)}</dd></div>}
+              </dl>
+            </div>
+            <div class="mt-8 flex flex-wrap gap-3">
+              <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(full)}`} target="_blank" rel="noopener noreferrer" class="btn btn-outline">Get Directions</a>
+              <a href={site.appointmentHref} class="btn btn-appointment">Request Appointment</a>
+            </div>
+          </div>
+          <iframe title={`Map of ${loc!.name} office`} src={`https://maps.google.com/maps?q=${encodeURIComponent(full)}&z=15&output=embed`} loading="lazy" referrerpolicy="no-referrer-when-downgrade" class="h-80 w-full border-0 md:h-full md:min-h-[26rem]"></iframe>
+        </div>
+      </div>
+    </section>
+  ) : null}
+
+  <section class="section-pad bg-ivory" aria-labelledby="other-loc-title" id={here ? 'other-locations' : 'locations'}>
+      <div class="container-x">
+        <div class="mx-auto mb-12 max-w-3xl text-center">
+          <p class="eyebrow">Locations</p>
+          <h2 id="other-loc-title" class="section-title">{here ? 'Other locations where ' : 'Locations where '}{p.title} is offered</h2>
+          <div class="accent-rule mx-auto mt-6"></div>
+          <p class="mt-6 text-lg text-muted">{here ? 'Also offered at our other offices. ' : ''}Choose the office closest to you. Call {site.phone} and we will help you book.</p>
+        </div>
+        <ul class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+          {locations.map((l, i) => ({ l, i })).filter(({ l }) => l.slug !== loc?.slug).map(({ l, i }) => (
+            <li>
+              <article class="group flex h-full flex-col overflow-hidden rounded-md border border-accent/25 bg-white shadow-sm">
+                <div class="relative aspect-[16/10] overflow-hidden bg-navy">
+                  <img src={officeImg(i)} data-temp-photo="unsplash" alt="" loading="lazy" class="h-full w-full object-cover" />
+                  <div class="absolute inset-0 bg-gradient-to-t from-navy/85 via-navy/10 to-transparent"></div>
+                  <h3 class="absolute bottom-4 left-6 font-display text-3xl text-white">{l.name}</h3>
+                </div>
+                <div class="flex flex-1 flex-col p-7">
+                  <address class="not-italic leading-relaxed text-ink">{l.address}<br />{l.zip}</address>
+                  <dl class="mb-6 mt-4 space-y-1 text-sm">
+                    <div class="flex gap-2"><dt class="font-semibold text-navy">Phone:</dt><dd><a class="text-muted hover:text-accent" href={site.phoneHref}>{site.phone}</a></dd></div>
+                    <div class="flex gap-2"><dt class="font-semibold text-navy">Email:</dt><dd><a class="text-muted hover:text-accent" href={`mailto:${site.email}`}>{site.email}</a></dd></div>
+                  </dl>
+                  <a href={`${base}/${l.slug}`} class="group/cta mt-auto flex items-center justify-between gap-4 border-t border-accent/20 pt-5 text-navy transition-colors hover:text-accent" aria-label={`${p.title} in ${l.name}`}>
+                    <span class="text-xs font-semibold uppercase tracking-[0.22em]">View {l.name.split(',')[0]} page</span>
+                    <span aria-hidden="true" class="flex h-10 w-10 items-center justify-center rounded-full border border-accent/40 text-accent transition-all duration-500 group-hover/cta:translate-x-1 group-hover/cta:border-accent group-hover/cta:bg-accent group-hover/cta:text-white">→</span>
+                  </a>
+                </div>
+              </article>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+  <section class="section-pad bg-cream" aria-labelledby="other-title">
+    <div class="container-x">
+      <div class="mx-auto mb-12 max-w-3xl text-center"><p class="eyebrow">Other Treatments</p><h2 id="other-title" class="section-title">More ways we treat pain</h2><div class="accent-rule mx-auto mt-6"></div></div>
+      <ServicesGrid client:visible items={others} />
+    </div>
+  </section>
+  <PageCta />
+</BaseLayout>

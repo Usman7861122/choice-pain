@@ -1,0 +1,8 @@
+---
+import TreatmentPageView from '../../components/astro/TreatmentPageView.astro';
+import { gae } from '../../data/gae';
+import { localAreas } from '../../data/local-areas';
+export function getStaticPaths() { return Object.keys(localAreas).map((loc) => ({ params: { loc }, props: { loc } })); }
+const { loc } = Astro.props;
+---
+<TreatmentPageView t={gae} loc={loc} />

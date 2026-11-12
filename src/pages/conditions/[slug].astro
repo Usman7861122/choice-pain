@@ -1,0 +1,14 @@
+---
+import ConditionPageView from '../../components/astro/ConditionPageView.astro';
+import ConditionGroupView from '../../components/astro/ConditionGroupView.astro';
+import { conditionPages } from '../../data/condition-pages';
+import { conditionGroups } from '../../data/condition-groups';
+export function getStaticPaths() {
+  return [
+    ...Object.values(conditionPages).map((p) => ({ params: { slug: p.slug }, props: { p } })),
+    ...conditionGroups.map((g) => ({ params: { slug: g.slug }, props: { g } })),
+  ];
+}
+const { p, g } = Astro.props;
+---
+{g ? <ConditionGroupView g={g} /> : <ConditionPageView p={p} />}

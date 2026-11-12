@@ -1,0 +1,7 @@
+---
+import TreatmentPageView from '../../components/astro/TreatmentPageView.astro';
+import { treatmentList } from '../../data/treatments';
+export function getStaticPaths() { return treatmentList.map((t) => ({ params: { slug: t.slug }, props: { t } })); }
+const { t } = Astro.props;
+---
+<TreatmentPageView t={t} />

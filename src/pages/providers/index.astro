@@ -1,0 +1,71 @@
+---
+import LocationsSection from '../../components/astro/LocationsSection.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/astro/PageHero.astro';
+import FadeIn from '../../components/react/FadeIn';
+import { providers } from '../../data/providers';
+import { site } from '../../data/content';
+import { aboutImage } from '../../data/images';
+const facts = [
+  { n: '10', label: 'Offices in Maryland & Delaware' },
+  { n: '2', label: 'Languages for patient forms: English & Spanish' },
+  { n: '1', label: 'Goal: restore function and get you moving' },
+];
+---
+<BaseLayout overlay title="Our Providers | Choice Pain & Rehabilitation Center" description="Meet the physicians and nurse practitioner at CHOICE Pain & Rehabilitation Center. Nonsurgical, minimally invasive pain care across Maryland and Delaware.">
+  <PageHero eyebrow="Our Providers" title="Care from specialists who listen first" lede="Our team treats pain with nonsurgical, minimally invasive care, patient education and rehabilitation, so you can get back to what you enjoy." image={aboutImage} alt="Choice Pain provider greeting a patient" />
+
+  <section class="section-pad bg-ivory" aria-labelledby="team-title">
+    <div class="container-x">
+      <div class="mx-auto max-w-3xl text-center">
+        <p class="eyebrow">The Team</p>
+        <h2 id="team-title" class="section-title">Meet your providers</h2>
+        <div class="accent-rule mx-auto mt-6"></div>
+        <p class="mt-6 text-lg text-muted">Each provider tailors treatment to your diagnosis, your history and your goals.</p>
+      </div>
+      <div class="mt-14 grid gap-8 md:grid-cols-3">
+        {providers.map((d, i) => (
+          <FadeIn client:visible delay={i * 0.12}>
+            <article class="group h-full overflow-hidden rounded-md border border-accent/25 bg-white shadow-sm transition duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-navy/15">
+              <a href={`/providers/${d.slug}`} class="block" aria-label={`View ${d.name}`}>
+                <div class="relative aspect-square overflow-hidden bg-gradient-to-br from-navy-800 to-navy-700">
+                  <img src={d.img} alt={d.name} loading="lazy" class="h-full w-full object-cover object-top transition duration-[1200ms] group-hover:scale-105" />
+                </div>
+              </a>
+              <div class="flex flex-col p-7 text-center">
+                <h3 class="text-2xl text-navy"><a href={`/providers/${d.slug}`}>{d.name}</a></h3>
+                <p class="mt-1 text-xs font-medium uppercase tracking-[0.2em] text-accent">{d.role}</p>
+                <div class="accent-rule mx-auto my-5"></div>
+                <p class="text-muted">{d.intro}</p>
+                <div class="mt-6"><a href={`/providers/${d.slug}`} class="btn btn-outline">View Profile</a></div>
+              </div>
+            </article>
+          </FadeIn>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section-pad relative overflow-hidden bg-navy text-white" aria-labelledby="approach-title">
+    <div class="container-x grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
+      <div>
+        <p class="eyebrow !text-accent-light">Our Approach</p>
+        <h2 id="approach-title" class="mt-4 font-display text-4xl font-light leading-tight md:text-6xl">One team, one plan, <span class="hero-word">your recovery</span></h2>
+        <p class="mt-6 text-lg leading-relaxed text-white/80">Every provider uses image-guided procedures, regenerative options and rehabilitation to treat pain at its source. We explain each step, so you always know what comes next.</p>
+        <div class="mt-8 flex flex-wrap gap-4">
+          <a href={site.appointmentHref} class="btn btn-appointment">Request Appointment</a>
+          <a href={site.phoneHref} class="btn btn-light">Call {site.phone}</a>
+        </div>
+      </div>
+      <div class="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
+        {facts.map((f) => (
+          <div class="rounded-md border border-white/15 bg-white/5 p-6 backdrop-blur">
+            <p class="font-display text-5xl text-accent-light">{f.n}</p>
+            <p class="mt-1 text-white/80">{f.label}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+  <LocationsSection />
+</BaseLayout>

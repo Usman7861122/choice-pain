@@ -1,0 +1,12 @@
+---
+// Renders a third-party iframe or script if a URL is set, otherwise the fallback slot.
+interface Props { iframe?: string; script?: string; title: string; height?: number }
+const { iframe = '', script = '', title, height = 640 } = Astro.props;
+const has = Boolean(iframe || script);
+---
+{has ? (
+  <div class="overflow-hidden rounded-md border border-accent/25 bg-white shadow-xl shadow-navy/10">
+    {iframe && <iframe src={iframe} title={title} loading="lazy" class="w-full border-0" style={`height:${height}px`} referrerpolicy="no-referrer-when-downgrade"></iframe>}
+    {script && <script is:inline src={script} async></script>}
+  </div>
+) : <slot />}

@@ -1,0 +1,8 @@
+---
+import TreatmentPageView from '../../../components/astro/TreatmentPageView.astro';
+import { treatmentList } from '../../../data/treatments';
+import { localAreas } from '../../../data/local-areas';
+export function getStaticPaths() { return treatmentList.flatMap((t) => Object.keys(localAreas).map((loc) => ({ params: { slug: t.slug, loc }, props: { t, loc } }))); }
+const { t, loc } = Astro.props;
+---
+<TreatmentPageView t={t} loc={loc} />

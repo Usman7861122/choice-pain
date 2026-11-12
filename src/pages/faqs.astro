@@ -1,0 +1,47 @@
+---
+import LocationsSection from '../components/astro/LocationsSection.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/astro/PageHero.astro';
+import PageCta from '../components/astro/PageCta.astro';
+import { faqGroups } from '../data/faqs';
+import { parallaxImage } from '../data/images';
+const all = faqGroups.flatMap((g) => g.items);
+const schema = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: all.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) };
+---
+<BaseLayout overlay title="FAQs | Choice Pain & Rehabilitation Center" description="Answers to common questions about back pain, spine conditions, surgery and procedures from CHOICE Pain & Rehabilitation Center.">
+  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+  <PageHero eyebrow="FAQs" title="Your questions, answered" lede="Clear answers about back pain, spine conditions and your treatment options." image={parallaxImage} />
+  <section class="section-pad bg-ivory">
+    <div class="container-x grid gap-12 lg:grid-cols-[260px_1fr] lg:gap-16">
+      <nav aria-label="FAQ topics" class="lg:sticky lg:top-28 lg:self-start">
+        <p class="eyebrow">Topics</p>
+        <ul class="mt-5 flex flex-wrap gap-2 lg:flex-col">
+          {faqGroups.map((g) => (<li><a href={`#${g.id}`} class="flex items-center justify-between gap-4 rounded-md border border-accent/25 bg-white px-4 py-3 text-sm font-medium text-navy transition duration-300 hover:border-accent hover:bg-navy hover:text-white"><span>{g.title}</span><span class="text-xs text-accent">{g.items.length}</span></a></li>))}
+        </ul>
+      </nav>
+      <div class="space-y-14">
+        {faqGroups.map((g) => (
+          <div id={g.id} class="scroll-mt-28">
+            <h2 class="font-display text-4xl text-navy md:text-5xl">{g.title}</h2>
+            <div class="accent-rule mt-4"></div>
+            <div class="mt-8 space-y-3">
+              {g.items.map((f) => (
+                <details class="group rounded-md border border-accent/25 bg-white transition duration-300 open:border-accent open:shadow-lg open:shadow-navy/10">
+                  <summary class="flex cursor-pointer list-none items-center justify-between gap-6 p-5 font-display text-2xl text-navy marker:hidden [&::-webkit-details-marker]:hidden">
+                    {f.q}
+                    <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-cream text-accent transition duration-300 group-open:rotate-45 group-open:bg-accent group-open:text-white" aria-hidden="true">
+                      <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+                    </span>
+                  </summary>
+                  <p class="px-5 pb-6 leading-relaxed text-muted">{f.a}</p>
+                </details>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+  <LocationsSection />
+  <PageCta title="Still have a question?" text="Our team is happy to talk. Call us or request an appointment." />
+</BaseLayout>

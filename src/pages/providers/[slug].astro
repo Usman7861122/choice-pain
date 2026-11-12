@@ -1,0 +1,211 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/astro/PageHero.astro';
+import FadeIn from '../../components/react/FadeIn';
+import LocationsTabs from '../../components/react/LocationsTabs';
+import { locations } from '../../data/locations';
+import { providers } from '../../data/providers';
+import { site } from '../../data/content';
+import { aboutImage } from '../../data/images';
+export function getStaticPaths() { return providers.map((p) => ({ params: { slug: p.slug }, props: { p } })); }
+const { p } = Astro.props;
+const offices = p.officeSlugs.length ? locations.filter((l) => p.officeSlugs.includes(l.slug)) : locations;
+const others = providers.filter((o) => o.slug !== p.slug);
+const schema = { '@context': 'https://schema.org', '@type': 'Physician', name: p.name, medicalSpecialty: 'PainMedicine', image: `https://choicepain.com${p.img}`, url: `https://choicepain.com/providers/${p.slug}`, worksFor: { '@type': 'MedicalBusiness', name: site.name } };
+---
+<BaseLayout overlay title={`${p.name} | Choice Pain & Rehabilitation Center`} description={`${p.name}, ${p.role} at CHOICE Pain & Rehabilitation Center. ${p.intro}`}>
+  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+  <PageHero eyebrow={p.role} title={p.name} lede={p.intro} image={aboutImage} />
+
+  <section class="section-pad bg-ivory">
+    <div class="container-x grid gap-14 lg:grid-cols-[minmax(0,420px)_1fr] lg:gap-20">
+      <FadeIn client:visible>
+        <div class="group relative mx-auto w-full max-w-md lg:sticky lg:top-28">
+          <div class="absolute -left-4 -top-4 h-full w-full rounded-md border border-accent/60 transition-all duration-700 group-hover:-left-2 group-hover:-top-2" aria-hidden="true"></div>
+          <div class="relative overflow-hidden rounded-md shadow-2xl shadow-navy/20">
+            <img src={p.img} alt={p.name} class="img-sq object-top" />
+          </div>
+        </div>
+      </FadeIn>
+      <div>
+        <FadeIn client:visible>
+          <p class="eyebrow">About {p.short}</p>
+          <h2 class="section-title">Care built around you</h2>
+          <div class="accent-rule mt-6"></div>
+          {p.bio.map((t) => <p class="mt-6 text-lg leading-relaxed text-muted">{t}</p>)}
+        </FadeIn>
+        <div class="mt-12 grid items-stretch gap-6 sm:grid-cols-2">
+          <div class="group relative flex flex-col overflow-hidden rounded-md bg-navy p-8 text-white shadow-xl shadow-navy/20">
+            <div class="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-accent/30 blur-3xl transition-all duration-700 group-hover:scale-125"></div>
+            <div class="pointer-events-none absolute -bottom-20 -left-10 h-48 w-48 rounded-full bg-accent-light/10 blur-3xl"></div>
+            <p class="relative text-xs font-medium uppercase tracking-[0.25em] text-accent-light">Specialties</p>
+            <h3 class="relative mt-2 text-3xl font-light">Focus areas</h3>
+            <ul class="relative mt-6 flex flex-1 flex-col justify-between gap-3">
+              {p.focus.map((f) => (
+                <li class="flex items-center gap-4 rounded-md border border-white/10 bg-white/5 px-4 py-3.5 transition duration-300 hover:translate-x-1 hover:border-accent-light/50 hover:bg-white/10">
+                  <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent/90">
+                    <svg class="h-4 w-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5 10 17.5 19 7"/></svg>
+                  </span>
+                  <span class="leading-snug text-white/90">{f}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          {p.education.length > 0 && (
+            <div class="relative flex flex-col overflow-hidden rounded-md border border-accent/25 bg-white p-8 shadow-xl shadow-navy/10">
+              <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-accent via-accent-light to-accent"></div>
+              <p class="text-xs font-medium uppercase tracking-[0.25em] text-accent">Background</p>
+              <h3 class="mt-2 text-3xl font-light text-navy">Education &amp; training</h3>
+              <ol class="relative mt-6 flex-1 space-y-5 border-l border-accent/30 pl-7">
+                {p.education.map((f) => (
+                  <li class="group/item relative text-muted transition hover:text-navy">
+                    <span class="absolute -left-[2.08rem] top-1.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-white ring-2 ring-accent/50 transition group-hover/item:ring-accent"><span class="h-1.5 w-1.5 rounded-full bg-accent"></span></span>
+                    {f}
+                  </li>
+                ))}
+              </ol>
+              {p.board && (
+                <div class="mt-7 flex items-center gap-4 rounded-md bg-cream p-4">
+                  <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-navy text-accent-light">
+                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4.5 6v5.5c0 4.4 3 7.9 7.5 9.5 4.5-1.6 7.5-5.1 7.5-9.5V6L12 3Z"/><path d="m9 12 2.2 2.2L15.5 10"/></svg>
+                  </span>
+                  <p class="text-sm leading-snug text-navy"><span class="block text-xs font-medium uppercase tracking-[0.18em] text-accent">Board certification</span>{p.board}</p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+        <div class="mt-10 flex flex-wrap gap-4">
+          <a href={site.appointmentHref} class="btn btn-appointment">Request Appointment</a>
+          <a href={site.phoneHref} class="btn btn-outline">Call {site.phone}</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {p.highlights && (
+    <section class="relative overflow-hidden bg-navy py-14 text-white" aria-label="Highlights">
+      <div class="container-x grid gap-6 md:grid-cols-3">
+        {p.highlights.map((h) => (
+          <div class="rounded-md border border-white/15 bg-white/5 p-7 text-center backdrop-blur">
+            <p class="hero-word font-display text-5xl">{h.n}</p>
+            <p class="mt-2 text-white/80">{h.label}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  )}
+
+  {p.approach && (
+    <section class="section-pad relative overflow-hidden bg-cream" aria-labelledby="approach-title">
+      <div class="pointer-events-none absolute left-1/2 top-1/2 h-[28rem] w-[70rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/10 blur-3xl"></div>
+      <div class="container-x relative">
+        <div class="mx-auto max-w-3xl text-center">
+          <p class="eyebrow">Approach</p>
+          <h2 id="approach-title" class="section-title">{p.approach.title}</h2>
+          <div class="accent-rule mx-auto mt-6"></div>
+        </div>
+        {/* Desktop: horizontal timeline, cards alternate above and below the line */}
+        <div class="relative mt-16 hidden lg:block">
+          <div class="absolute inset-x-0 top-[calc(14rem+1.75rem)] h-px bg-gradient-to-r from-transparent via-accent to-transparent"></div>
+          <ol class="relative grid grid-cols-5 gap-5">
+            {p.approach.steps.map((st, i) => (
+              <li class="group grid grid-rows-[14rem_3.5rem_14rem]">
+                {i % 2 === 0 ? (
+                  <div class="flex flex-col items-center justify-end">
+                    <div class="w-full rounded-md bg-gradient-to-b from-white/75 to-white/30 p-5 text-center group-hover:-translate-y-2 group-hover:from-white group-hover:to-white/60 border border-white/70 ring-1 ring-accent/15 backdrop-blur-md shadow-[0_24px_50px_-28px_rgba(11,31,58,0.35)] transition duration-500">
+                      <h3 class="text-2xl text-navy">{st.title}</h3>
+                      <p class="mt-2 text-sm leading-relaxed text-muted">{st.text}</p>
+                    </div>
+                    <span class="h-5 w-px bg-accent/50"></span>
+                  </div>
+                ) : <div></div>}
+                <div class="flex items-center justify-center">
+                  <span class="relative z-10 flex h-14 w-14 items-center justify-center rounded-full border-4 border-cream bg-navy font-display text-xl text-accent-light shadow-lg shadow-navy/30 transition duration-500 group-hover:scale-110 group-hover:bg-accent group-hover:text-white">0{i + 1}</span>
+                </div>
+                {i % 2 === 1 ? (
+                  <div class="flex flex-col items-center justify-start">
+                    <span class="h-5 w-px bg-accent/50"></span>
+                    <div class="w-full rounded-md bg-gradient-to-t from-white/75 to-white/30 p-5 text-center group-hover:translate-y-2 group-hover:from-white group-hover:to-white/60 border border-white/70 ring-1 ring-accent/15 backdrop-blur-md shadow-[0_24px_50px_-28px_rgba(11,31,58,0.35)] transition duration-500">
+                      <h3 class="text-2xl text-navy">{st.title}</h3>
+                      <p class="mt-2 text-sm leading-relaxed text-muted">{st.text}</p>
+                    </div>
+                  </div>
+                ) : <div></div>}
+              </li>
+            ))}
+          </ol>
+        </div>
+
+        {/* Mobile and tablet: vertical timeline */}
+        <ol class="relative mx-auto mt-12 max-w-xl space-y-6 border-l border-accent/40 pl-8 lg:hidden">
+          {p.approach.steps.map((st, i) => (
+            <li class="relative">
+              <span class="absolute -left-[3.15rem] top-3 flex h-10 w-10 items-center justify-center rounded-full border-4 border-cream bg-navy font-display text-base text-accent-light">0{i + 1}</span>
+              <div class="rounded-md bg-gradient-to-br from-white/75 to-white/30 p-5 border border-white/70 ring-1 ring-accent/15 backdrop-blur-md shadow-[0_24px_50px_-28px_rgba(11,31,58,0.35)] transition duration-500">
+                <h3 class="text-2xl text-navy">{st.title}</h3>
+                <p class="mt-2 text-muted">{st.text}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+  )}
+
+  {p.awards && (
+    <section class="section-pad bg-ivory" aria-labelledby="awards-title">
+      <div class="container-x">
+        <div class="mx-auto max-w-3xl text-center">
+          <p class="eyebrow">Recognition</p>
+          <h2 id="awards-title" class="section-title">Honors &amp; awards</h2>
+          <div class="accent-rule mx-auto mt-6"></div>
+        </div>
+        <ul class="mx-auto mt-12 grid max-w-4xl gap-6 md:grid-cols-3">
+          {p.awards.map((a, i) => (
+            <li class="group flex flex-col items-center rounded-md border border-accent/25 bg-white p-8 text-center transition duration-500 hover:-translate-y-2 hover:shadow-xl hover:shadow-navy/10">
+              <span class="flex h-16 w-16 items-center justify-center rounded-full bg-cream text-accent ring-1 ring-accent/20 transition duration-500 group-hover:bg-navy group-hover:text-accent-light">
+                <svg class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  {i === 0 && <><path d="M8 4h8v5a4 4 0 0 1-8 0V4Z"/><path d="M8 6H5v1.5A3 3 0 0 0 8 10.5M16 6h3v1.5a3 3 0 0 1-3 3"/><path d="M12 13v4M8.5 20h7M10 17h4"/></>}
+                  {i === 1 && <path d="m12 3.5 2.6 5.3 5.9.9-4.250 4.100 1 5.800L12 16.900 6.750 19.600l1-5.800L3.500 9.700l5.900-.9L12 3.500Z"/>}
+                  {i === 2 && <path d="M12 20.500s-7.500-4.500-7.500-10A4.300 4.300 0 0 1 12 7.800a4.300 4.300 0 0 1 7.500 2.700c0 5.500-7.500 10-7.500 10Z"/>}
+                  {i > 2 && <><circle cx="12" cy="9" r="5"/><path d="M9 13.500 7.500 21l4.500-2.500 4.500 2.500L15 13.500"/></>}
+                </svg>
+              </span>
+              <p class="mt-5 font-display text-2xl text-navy">{a}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )}
+
+  <section class="section-pad bg-ivory" aria-labelledby="loc-title">
+    <div class="container-x">
+      <div class="mx-auto mb-12 max-w-3xl text-center">
+        <p class="eyebrow">Locations</p>
+        <h2 id="loc-title" class="section-title">{p.officeSlugs.length ? `Where to see ${p.short}` : 'Our offices across Maryland & Delaware'}</h2>
+        <div class="accent-rule mx-auto mt-6"></div>
+        {!p.officeSlugs.length && <p class="mt-6 text-lg text-muted">{p.notes}</p>}
+      </div>
+      <LocationsTabs client:visible locations={offices} phone={site.phone} phoneHref={site.phoneHref} email={site.email} />
+    </div>
+  </section>
+
+  <section class="section-pad bg-cream" aria-labelledby="others-title">
+    <div class="container-x">
+      <div class="mx-auto max-w-2xl text-center">
+        <p class="eyebrow">The Team</p>
+        <h2 id="others-title" class="section-title">Meet our other providers</h2>
+      </div>
+      <div class="mx-auto mt-12 grid max-w-3xl gap-8 sm:grid-cols-2">
+        {others.map((o) => (
+          <a href={`/providers/${o.slug}`} class="group overflow-hidden rounded-md border border-accent/25 bg-white transition duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-navy/15">
+            <div class="aspect-square overflow-hidden bg-navy-800"><img src={o.img} alt={o.name} loading="lazy" class="h-full w-full object-cover object-top transition duration-[1200ms] group-hover:scale-105" /></div>
+            <div class="p-6 text-center"><h3 class="text-2xl text-navy">{o.name}</h3><p class="mt-1 text-xs font-medium uppercase tracking-[0.2em] text-accent">{o.role}</p></div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>

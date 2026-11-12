@@ -1,0 +1,25 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/astro/PageHero.astro';
+import PageCta from '../../components/astro/PageCta.astro';
+import LocationsSection from '../../components/astro/LocationsSection.astro';
+import ServicesGrid from '../../components/react/ServicesGrid';
+import { treatmentList, treatmentGroups } from '../../data/treatments';
+import { site } from '../../data/content';
+const strip = 'Patients are welcome from across Maryland and Delaware, including Hyattsville, Gaithersburg, Baltimore, Newark, Milford and the surrounding areas.';
+---
+<BaseLayout overlay title="Pain Injection Treatments | Choice Pain & Rehabilitation Center" description="Nerve blocks, epidural injections, radiofrequency treatment, spinal cord stimulation and more. 24 pain treatments at 10 offices in Maryland and Delaware.">
+  <PageHero eyebrow="Treatment · Maryland & Delaware" title="Pain Injection Treatments" strip={strip} lede="Nerve blocks, epidural injections, radiofrequency treatment and more. We choose the gentlest option that is likely to work for you." image="/images/stock/2756848845.webp" alt="Doctor showing a patient a spine model">
+    <div class="mt-8 flex flex-wrap gap-3"><a href={site.appointmentHref} class="btn btn-appointment">Request Appointment</a><a href={site.phoneHref} class="btn btn-light">Call {site.phone}</a></div>
+  </PageHero>
+  {treatmentGroups.map((g, gi) => (
+    <section class={`section-pad ${gi % 2 ? 'bg-cream' : 'bg-ivory'}`}>
+      <div class="container-x">
+        <div class="mx-auto mb-12 max-w-3xl text-center"><p class="eyebrow">Treatments</p><h2 class="section-title">{g}</h2><div class="accent-rule mx-auto mt-6"></div></div>
+        <ServicesGrid client:visible base="/treatment" items={treatmentList.filter((t) => t.group === g).map((t) => ({ slug: t.slug, title: t.title, text: t.short, img: `/images/stock/${t.ph[0]}.webp` }))} />
+      </div>
+    </section>
+  ))}
+  <LocationsSection />
+  <PageCta />
+</BaseLayout>

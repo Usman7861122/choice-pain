@@ -1,0 +1,45 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/astro/PageHero.astro';
+import PageCta from '../../components/astro/PageCta.astro';
+import LocationsSection from '../../components/astro/LocationsSection.astro';
+import ServicesGrid from '../../components/react/ServicesGrid';
+import FadeIn from '../../components/react/FadeIn';
+import { featuredServices, serviceGroups } from '../../data/services';
+import { serviceImages, aboutImage } from '../../data/images';
+import { site } from '../../data/content';
+const items = featuredServices.map((x) => ({ ...x, img: serviceImages[x.slug] }));
+---
+<BaseLayout overlay title="Pain Management Treatments | Choice Pain & Rehabilitation Center" description="Minimally invasive pain treatments in Maryland and Delaware: epidural steroid injections, radiofrequency ablation, spinal cord stimulation, MILD, kyphoplasty and regenerative medicine.">
+  <PageHero eyebrow="Treatments" title="Minimally invasive care for the spine, joints and nerves" accent="nerves" lede="Explore our featured treatments, then see the full list of procedures we offer across ten offices in Maryland and Delaware." image={aboutImage} alt="Doctor explaining a treatment to a patient" strip="Patients are welcome from across Maryland and Delaware, including Hyattsville, Gaithersburg, Baltimore, Newark and Milford and the surrounding areas.">
+    <div class="mt-8 flex flex-wrap gap-3"><a href={site.appointmentHref} class="btn btn-appointment">Request Appointment</a><a href={site.phoneHref} class="btn btn-light">Call {site.phone}</a></div>
+  </PageHero>
+
+  <section class="section-pad bg-ivory" aria-labelledby="feat-title">
+    <div class="container-x">
+      <div class="mx-auto max-w-3xl text-center"><p class="eyebrow">Featured Treatments</p><h2 id="feat-title" class="section-title">Start with the treatment that fits you</h2><div class="accent-rule mx-auto mt-6"></div><p class="mt-6 text-lg text-muted">Each page explains how the treatment works, who it helps, what recovery is like and which office is closest to you.</p></div>
+      <div class="mt-14"><ServicesGrid client:visible items={items} /></div>
+    </div>
+  </section>
+
+  <section class="section-pad bg-cream" aria-labelledby="all-title">
+    <div class="container-x">
+      <div class="mx-auto max-w-3xl text-center"><p class="eyebrow">Everything We Offer</p><h2 id="all-title" class="section-title">Our full list of procedures</h2><div class="accent-rule mx-auto mt-6"></div><p class="mt-6 text-lg text-muted">Not sure which one you need? Call us. We start with your diagnosis and build a plan around your goals.</p></div>
+      <div class="mt-14 grid gap-6 md:grid-cols-2">
+        {serviceGroups.map((g, i) => (
+          <FadeIn client:visible delay={(i % 2) * 0.1}>
+            <div class="h-full rounded-md border border-accent/25 bg-white p-8">
+              <h3 class="font-display text-3xl text-navy">{g.group}</h3>
+              <div class="accent-rule mt-3"></div>
+              <ul class="mt-6 grid gap-x-8 gap-y-2.5 sm:grid-cols-2">
+                {g.items.map((it) => <li class="flex gap-3 text-[15.5px] leading-snug text-muted"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent"></span>{it}</li>)}
+              </ul>
+            </div>
+          </FadeIn>
+        ))}
+      </div>
+    </div>
+  </section>
+  <LocationsSection />
+  <PageCta />
+</BaseLayout>

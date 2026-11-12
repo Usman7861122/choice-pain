@@ -1,0 +1,99 @@
+---
+import LocationsSection from '../components/astro/LocationsSection.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/astro/PageHero.astro';
+import PageCta from '../components/astro/PageCta.astro';
+import FadeIn from '../components/react/FadeIn';
+import Testimonials from '../components/react/Testimonials';
+import { site, aboutPoints } from '../data/content';
+import { conditions } from '../data/conditions';
+import { aboutImage, heroSlides } from '../data/images';
+import { insurers, testimonials } from '../data/assets';
+import { social } from '../data/thirdparty';
+const links = [
+  { t: 'Providers', d: 'Meet our physicians and nurse practitioner.', h: '/providers' },
+  { t: 'FAQs', d: 'Answers about back pain, spine care and procedures.', h: '/faqs' },
+  { t: 'Billing & Insurance', d: 'Hours, insurance, refills and cancellations.', h: '/billing-insurance' },
+  { t: 'Testimonials', d: 'What our patients say about their care.', h: '/testimonials' },
+  { t: 'For Physicians', d: 'How to refer a patient to our team.', h: '/for-physicians' },
+  { t: 'Careers', d: 'Join a team that puts patients first.', h: '/careers' },
+];
+---
+<BaseLayout overlay title="About Us | Choice Pain & Rehabilitation Center" description="CHOICE Pain & Rehabilitation Center is a multidisciplinary pain clinic serving Maryland and Delaware. Learn about our care, providers and offices.">
+  <PageHero eyebrow="About Us" title="Relief that lasts, from a team that listens" lede="CHOICE Pain & Rehabilitation Center is a multidisciplinary pain clinic serving Maryland and the Washington, D.C. area." image={heroSlides[0].img} alt={heroSlides[0].alt} />
+
+  <section class="section-pad bg-ivory">
+    <div class="container-x grid items-center gap-14 lg:grid-cols-2 lg:gap-20">
+      <FadeIn client:visible>
+        <div class="group relative mx-auto max-w-xl">
+          <div class="absolute -left-5 -top-5 h-full w-full rounded-md border border-accent/60 transition-all duration-700 group-hover:-left-2 group-hover:-top-2" aria-hidden="true"></div>
+          <div class="relative overflow-hidden rounded-md shadow-2xl shadow-navy/20"><img src={aboutImage} alt="Doctor warmly greeting a patient" class="img-sq transition-transform duration-[1400ms] ease-out group-hover:scale-105" loading="lazy" /></div>
+        </div>
+      </FadeIn>
+      <FadeIn client:visible delay={0.15}>
+        <p class="eyebrow">Our Story</p>
+        <h2 class="section-title">About Choice Pain &amp; Rehabilitation Center</h2>
+        <div class="accent-rule mt-6"></div>
+        <p class="mt-6 text-lg leading-relaxed text-muted">We care for adults with muscle, joint, nerve, chronic and acute pain. Our team builds a plan around your diagnosis and your life, using nonsurgical and minimally invasive care.</p>
+        <p class="mt-4 text-lg leading-relaxed text-muted">Many plans include injection therapy, which places medicine right where the nerve is irritated to calm pain and swelling. Relief can last for months, and often lasts longer when it is paired with physical therapy.</p>
+        <div class="mt-8 grid grid-cols-3 gap-4">
+          {aboutPoints.map((a) => (
+            <div class="rounded-md border border-accent/25 bg-white p-4 text-center"><p class="hero-word font-display text-4xl text-accent">{a.n}</p><p class="mt-1 text-xs leading-snug text-muted">{a.label}</p></div>
+          ))}
+        </div>
+        <div class="mt-8 flex flex-wrap gap-4"><a href="/providers" class="btn btn-outline">Meet Our Providers</a><a href={site.appointmentHref} class="btn btn-appointment">Request Appointment</a></div>
+      </FadeIn>
+    </div>
+  </section>
+
+  <section class="section-pad relative overflow-hidden bg-navy text-white" aria-labelledby="treat-title">
+    <div class="pointer-events-none absolute -right-20 top-0 h-80 w-80 rounded-full bg-accent/25 blur-3xl"></div>
+    <div class="container-x relative">
+      <div class="mx-auto max-w-3xl text-center">
+        <p class="eyebrow !text-accent-light">What We Treat</p>
+        <h2 id="treat-title" class="mt-4 font-display text-4xl font-light md:text-6xl">Pain in every part of the body</h2>
+        <p class="mt-5 text-lg text-white/75">Back and joint pain, arthritis, fibromyalgia, headaches, TMJ, cancer pain, pain after surgery and more.</p>
+      </div>
+      <ul class="mt-12 flex flex-wrap justify-center gap-3">
+        {conditions.map((c) => (<li><a href={`/conditions/${c.slug}`} class="inline-block rounded-full border border-white/20 bg-white/5 px-5 py-2.5 text-sm transition duration-300 hover:border-accent-light hover:bg-accent hover:text-white">{c.title}</a></li>))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section-pad bg-ivory" aria-labelledby="explore-title">
+    <div class="container-x">
+      <div class="mx-auto max-w-3xl text-center"><p class="eyebrow">Explore</p><h2 id="explore-title" class="section-title">Everything you need to know</h2><div class="accent-rule mx-auto mt-6"></div></div>
+      <ul class="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {links.map((l) => (
+          <li><a href={l.h} class="group flex h-full flex-col rounded-md border border-accent/25 bg-white p-8 transition duration-500 hover:-translate-y-2 hover:bg-navy hover:shadow-2xl hover:shadow-navy/20">
+            <h3 class="text-3xl text-navy transition group-hover:text-white">{l.t}</h3>
+            <p class="mt-3 flex-1 text-muted transition group-hover:text-white/75">{l.d}</p>
+            <span class="mt-6 inline-flex items-center gap-2 text-sm font-medium text-accent transition-all group-hover:gap-4 group-hover:text-accent-light">Learn more <span aria-hidden="true">→</span></span>
+          </a></li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="bg-cream py-16" aria-label="Insurance">
+    <div class="container-x text-center">
+      <p class="eyebrow">Insurance</p>
+      <h2 class="section-title">Most major insurance plans accepted</h2>
+      <p class="mx-auto mt-5 max-w-2xl text-muted">We see patients with all insurers, though we may not be contracted with every plan. We will work with you on your medical and financial needs.</p>
+      <ul class="mt-10 flex flex-wrap items-center justify-center gap-4">
+        {insurers.map((n) => (<li class="flex h-20 w-40 items-center justify-center rounded-md border border-accent/25 bg-white p-4"><img src={n.src} alt={n.name} class="max-h-full max-w-full object-contain" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'font-display font-semibold capitalize text-navy',textContent:this.alt||''}))" /></li>))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section-pad bg-navy" aria-label="Patient testimonials"><div class="container-x"><Testimonials client:visible items={testimonials} /></div></section>
+
+  <section class="bg-ivory py-14 text-center"><div class="container-x"><p class="eyebrow">Follow Us</p>
+    <div class="mt-6 flex justify-center gap-4">
+      <a class="btn btn-outline" href={social.facebook} rel="noopener" target="_blank">Facebook</a>
+      <a class="btn btn-outline" href={social.instagram} rel="noopener" target="_blank">Instagram</a>
+      <a class="btn btn-outline" href={social.linkedin} rel="noopener" target="_blank">LinkedIn</a>
+    </div></div></section>
+  <LocationsSection />
+  <PageCta />
+</BaseLayout>

@@ -1,0 +1,12 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import FadeIn from '../components/react/FadeIn';
+---
+<BaseLayout title="About | Choice Pain">
+  <section class="mx-auto max-w-3xl px-6 py-24">
+    <FadeIn client:visible>
+      <h1 class="text-4xl font-bold">About</h1>
+      <p class="mt-6 text-neutral-600">Add your content here.</p>
+    </FadeIn>
+  </section>
+</BaseLayout>

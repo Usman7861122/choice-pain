@@ -1,0 +1,85 @@
+---
+import LocationsSection from '../../components/astro/LocationsSection.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/astro/PageHero.astro';
+import PageCta from '../../components/astro/PageCta.astro';
+import { posts, type Block } from '../../data/blog';
+import { site } from '../../data/content';
+export function getStaticPaths() { return posts.map((p) => ({ params: { slug: p.slug }, props: { p } })); }
+const { p } = Astro.props;
+const related = [...posts.filter((x) => x.slug !== p.slug && x.category === p.category), ...posts.filter((x) => x.slug !== p.slug && x.category !== p.category)].slice(0, 3);
+// group consecutive list items
+const groups: { t: string; x?: string; items?: string[] }[] = [];
+p.blocks.forEach(([t, x]: Block) => {
+  if (t === 'li') { const l = groups[groups.length - 1]; if (l && l.t === 'ul') l.items!.push(x); else groups.push({ t: 'ul', items: [x] }); }
+  else groups.push({ t, x });
+});
+const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const toc = p.blocks.filter((b: Block) => b[0] === 'h2').map((b: Block) => ({ t: b[1], id: slug(b[1]) }));
+const schema = { '@context': 'https://schema.org', '@type': 'BlogPosting', headline: p.title, datePublished: p.date, image: `https://choicepain.com${p.image}`, author: { '@type': 'Organization', name: site.name }, publisher: { '@type': 'Organization', name: site.name }, mainEntityOfPage: `https://choicepain.com/blog/${p.slug}` };
+const imgFix = "this.onerror=null;this.src=this.dataset.fb";
+---
+<BaseLayout overlay title={`${p.title} | Choice Pain & Rehabilitation Center`} description={p.excerpt}>
+  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+  <PageHero eyebrow={`${p.category} · ${p.readTime} min read`} title={p.title} lede={p.dateLabel} image={p.image} />
+  <div id="progress" class="fixed inset-x-0 top-0 z-[60] h-1 origin-left scale-x-0 bg-gradient-to-r from-accent to-accent-light"></div>
+
+  <article class="section-pad bg-ivory">
+    <div class="container-x grid gap-14 lg:grid-cols-[1fr_280px] lg:gap-20">
+      <div class="mx-auto w-full max-w-3xl">
+        <div class="overflow-hidden rounded-md shadow-2xl shadow-navy/20"><img src={p.image} data-fb={p.fallback} onerror={imgFix} alt="" class="aspect-[16/9] w-full object-cover" /></div>
+        <div class="mt-12">
+          {groups.map((g) => {
+            if (g.t === 'p') return <p class="mt-6 text-lg leading-[1.85] text-muted">{g.x}</p>;
+            if (g.t === 'h2') return <h2 id={slug(g.x!)} class="mt-14 scroll-mt-28 font-display text-4xl leading-tight text-navy md:text-5xl">{g.x}<span class="accent-rule mt-4 block"></span></h2>;
+            if (g.t === 'h3') return <h3 class="mt-10 font-display text-3xl text-navy">{g.x}</h3>;
+            if (g.t === 'h4') return <h4 class="mt-8 font-display text-2xl text-accent">{g.x}</h4>;
+            if (g.t === 'blockquote') return <blockquote class="relative my-10 rounded-md border-l-4 border-accent bg-cream p-8 font-display text-2xl italic leading-snug text-navy">{g.x}</blockquote>;
+            if (g.t === 'ul') return <ul class="mt-6 space-y-3">{g.items!.map((i) => <li class="flex gap-4 text-lg leading-relaxed text-muted"><span class="mt-3 h-1.5 w-1.5 shrink-0 rounded-full bg-accent"></span><span>{i}</span></li>)}</ul>;
+            return null;
+          })}
+        </div>
+        <div class="mt-14 flex flex-wrap items-center justify-between gap-4 rounded-md border border-accent/25 bg-white p-6">
+          <p class="font-display text-2xl text-navy">Ready to feel better?</p>
+          <div class="flex flex-wrap gap-3"><a href={site.appointmentHref} class="btn btn-appointment">Request Appointment</a><a href={site.phoneHref} class="btn btn-outline">Call {site.phone}</a></div>
+        </div>
+      </div>
+      <aside class="hidden lg:block">
+        <div class="sticky top-28 space-y-8">
+          {toc.length > 0 && (
+            <nav aria-label="In this article" class="rounded-md border border-accent/25 bg-white p-6">
+              <p class="eyebrow">In this article</p>
+              <ul class="mt-5 space-y-3 border-l border-accent/30 pl-4 text-sm">
+                {toc.map((i: { t: string; id: string }) => <li><a href={`#${i.id}`} class="text-muted transition hover:text-accent">{i.t}</a></li>)}
+              </ul>
+            </nav>
+          )}
+          <a href="/blog" class="btn btn-outline w-full">← All articles</a>
+        </div>
+      </aside>
+    </div>
+  </article>
+
+  <section class="section-pad bg-cream" aria-labelledby="rel-title">
+    <div class="container-x">
+      <div class="mx-auto max-w-2xl text-center"><p class="eyebrow">Keep Reading</p><h2 id="rel-title" class="section-title">More from our blog</h2></div>
+      <ul class="mt-12 grid gap-8 md:grid-cols-3">
+        {related.map((b) => (
+          <li><a href={`/blog/${b.slug}`} class="group block h-full overflow-hidden rounded-md border border-accent/25 bg-white transition duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-navy/15">
+            <div class="aspect-[4/3] overflow-hidden bg-navy"><img src={b.image} data-fb={b.fallback} onerror={imgFix} alt="" loading="lazy" class="h-full w-full object-cover transition-transform duration-[1200ms] group-hover:scale-110" /></div>
+            <div class="p-6"><p class="text-xs font-medium uppercase tracking-[0.2em] text-accent">{b.category}</p><h3 class="mt-2 text-2xl leading-snug text-navy">{b.title}</h3></div>
+          </a></li>
+        ))}
+      </ul>
+    </div>
+  </section>
+  <LocationsSection />
+  <PageCta />
+</BaseLayout>
+<script is:inline>
+  (function () {
+    var bar = document.getElementById('progress'); if (!bar) return;
+    function f() { var h = document.documentElement; var m = h.scrollHeight - h.clientHeight; bar.style.transform = 'scaleX(' + (m > 0 ? h.scrollTop / m : 0) + ')'; }
+    window.addEventListener('scroll', f, { passive: true }); f();
+  })();
+</script>

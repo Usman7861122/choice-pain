@@ -1,0 +1,10 @@
+---
+import ServicePageView from '../../../components/astro/ServicePageView.astro';
+import { servicePages } from '../../../data/service-pages';
+import { localAreas } from '../../../data/local-areas';
+export function getStaticPaths() {
+  return Object.values(servicePages).flatMap((p) => Object.keys(localAreas).map((loc) => ({ params: { slug: p.slug, loc }, props: { p, loc } })));
+}
+const { p, loc } = Astro.props;
+---
+<ServicePageView p={p} loc={loc} />

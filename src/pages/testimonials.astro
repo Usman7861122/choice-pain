@@ -1,0 +1,48 @@
+---
+import LocationsSection from '../components/astro/LocationsSection.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/astro/PageHero.astro';
+import PageCta from '../components/astro/PageCta.astro';
+import Embed from '../components/astro/Embed.astro';
+import FadeIn from '../components/react/FadeIn';
+import { allTestimonials } from '../data/testimonials-all';
+import { embeds, social } from '../data/thirdparty';
+import { heroSlides } from '../data/images';
+---
+<BaseLayout overlay title="Patient Testimonials | Choice Pain & Rehabilitation Center" description="Read what patients say about their care at CHOICE Pain & Rehabilitation Center.">
+  <PageHero eyebrow="Testimonials" title="Patients in their own words" lede="Real stories from people who came to us in pain and found relief." image={heroSlides[1].img} alt={heroSlides[1].alt} />
+  <section class="section-pad relative overflow-hidden bg-ivory">
+    <div class="pointer-events-none absolute left-1/2 top-1/3 h-96 w-[60rem] -translate-x-1/2 rounded-full bg-accent/10 blur-3xl"></div>
+    <div class="container-x relative">
+      <ul class="columns-1 gap-6 md:columns-2 lg:columns-3 [&>li]:mb-6 [&>li]:break-inside-avoid">
+        {allTestimonials.map((t, i) => (
+          <li>
+            <FadeIn client:visible delay={(i % 3) * 0.08}>
+              <figure class="group relative overflow-hidden rounded-md border border-white/70 bg-gradient-to-b from-white/90 to-white/50 p-8 shadow-[0_24px_50px_-28px_rgba(11,31,58,0.35)] ring-1 ring-accent/15 backdrop-blur-md transition duration-500 hover:-translate-y-2">
+                <span class="absolute right-5 top-0 font-display text-8xl leading-none text-accent/20 transition group-hover:text-accent/40" aria-hidden="true">&ldquo;</span>
+                <blockquote class="relative text-lg leading-relaxed text-ink">{t.text}</blockquote>
+                <figcaption class="mt-6 flex items-center gap-3">
+                  <span class="flex h-10 w-10 items-center justify-center rounded-full bg-navy font-display text-lg text-accent-light">{t.name[0]}</span>
+                  <span class="font-medium text-navy">{t.name}</span>
+                </figcaption>
+              </figure>
+            </FadeIn>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+  <section class="section-pad bg-cream" aria-labelledby="rev-title">
+    <div class="container-x mx-auto max-w-4xl text-center">
+      <p class="eyebrow">Reviews</p><h2 id="rev-title" class="section-title">Share your experience</h2><div class="accent-rule mx-auto mt-6"></div>
+      <div class="mt-10">
+        <Embed iframe={embeds.reviewsWidget.iframe} script={embeds.reviewsWidget.script} title="Patient reviews">
+          <p class="text-lg text-muted">Tell others about your visit. We would love to hear how we did.</p>
+          <div class="mt-8 flex flex-wrap justify-center gap-4"><a class="btn btn-outline" href={social.facebook} target="_blank" rel="noopener">Review us on Facebook</a><a class="btn btn-outline" href="/locations">Contact us</a></div>
+        </Embed>
+      </div>
+    </div>
+  </section>
+  <LocationsSection />
+  <PageCta />
+</BaseLayout>
